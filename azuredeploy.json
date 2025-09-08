@@ -3,6 +3,14 @@
   "contentVersion": "1.0.0.0",
 
   "parameters": {
+    "alias": {
+      "type": "string",
+      "metadata": {
+        "description": "Your unique alias/identifier that will be appended to resource names (e.g., 'liod1'). This replaces <ALIAS> throughout the template."
+      },
+      "maxLength": 8,
+      "minLength": 1
+    },
     "assetLocationURI": {
       "type": "string",
       "metadata": {
@@ -243,7 +251,16 @@
     "DirSync-DeploymentName": "[concat(variables('deploymentName'),'-DirSync')]",
     "DirSync-DomainJoin-DeploymentName": "[concat(variables('deploymentName'),'-DirSync-DomainJoin')]",
     "passwordsMatch": "[equals(parameters('adminPassword'), parameters('adminPasswordConfirm'))]",
-    "passwordValidation": "[if(variables('passwordsMatch'), parameters('adminPassword'), div(1, 0))]"
+    "passwordValidation": "[if(variables('passwordsMatch'), parameters('adminPassword'), div(1, 0))]",
+    "computedVnetName": "[replace(parameters('vnetName'), '<ALIAS>', parameters('alias'))]",
+    "computedSubnet1Name": "[replace(parameters('subnet1Name'), '<ALIAS>', parameters('alias'))]",
+    "computedSubnet2Name": "[replace(parameters('subnet2Name'), '<ALIAS>', parameters('alias'))]",
+    "computedNetworkSecurityGroupName": "[replace(parameters('networkSecurityGroupName'), '<ALIAS>', parameters('alias'))]",
+    "computedExternalNetworkSecurityGroupName": "[replace(parameters('externalnetworkSecurityGroupName'), '<ALIAS>', parameters('alias'))]",
+    "computedDomainControllerName": "[replace(parameters('domainControllerName'), '<ALIAS>', parameters('alias'))]",
+    "computedRemoteDesktopGatewayName": "[replace(parameters('remoteDesktopGatewayName'), '<ALIAS>', parameters('alias'))]",
+    "computedAdfsServerName": "[replace(parameters('adfsServerName'), '<ALIAS>', parameters('alias'))]",
+    "computedDirSyncServerName": "[replace(parameters('dirSyncServerName'), '<ALIAS>', parameters('alias'))]"
   },
 
   "resources": [
@@ -258,14 +275,14 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "vnetName": { "value": "[parameters('vnetName')]" },
+          "vnetName": { "value": "[variables('computedVnetName')]" },
           "vnetAddressSpace": { "value": "[parameters('vnetAddressSpace')]" },
-          "subnet1Name": { "value": "[parameters('subnet1Name')]" },
+          "subnet1Name": { "value": "[variables('computedSubnet1Name')]" },
           "subnet1AddressSpace": { "value": "[parameters('subnet1AddressSpace')]" },
-          "subnet2Name": { "value": "[parameters('subnet2Name')]" },
+          "subnet2Name": { "value": "[variables('computedSubnet2Name')]" },
           "subnet2AddressSpace": { "value": "[parameters('subnet2AddressSpace')]" },
-          "networkSecurityGroupName": { "value": "[parameters('networkSecurityGroupName')]" },
-          "ExternalnetworkSecurityGroupName": { "value": "[parameters('ExternalnetworkSecurityGroupName')]" },
+          "networkSecurityGroupName": { "value": "[variables('computedNetworkSecurityGroupName')]" },
+          "ExternalnetworkSecurityGroupName": { "value": "[variables('computedExternalNetworkSecurityGroupName')]" },
           "yourPublicIpAddress":{"value": "[parameters('yourPublicIpAddress')]" },
           "OSImage": { "value": "[parameters('OSImage')]" }
         }
@@ -285,7 +302,7 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "vmName": { "value": "[parameters('domainControllerName')]" },
+          "vmName": { "value": "[variables('computedDomainControllerName')]" },
           "vmSize": { "value": "[parameters('domainControllerSize')]" },
           "adminUsername": { "value": "[parameters('adminUsername')]" },
           "adminPassword": { "value": "[variables('passwordValidation')]" },
@@ -313,14 +330,14 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "vnetName": { "value": "[parameters('vnetName')]" },
+          "vnetName": { "value": "[variables('computedVnetName')]" },
           "vnetAddressSpace": { "value": "[parameters('vnetAddressSpace')]" },
-          "subnet1Name": { "value": "[parameters('subnet1Name')]" },
+          "subnet1Name": { "value": "[variables('computedSubnet1Name')]" },
           "subnet1AddressSpace": { "value": "[parameters('subnet1AddressSpace')]" },
-          "subnet2Name": { "value": "[parameters('subnet2Name')]" },
+          "subnet2Name": { "value": "[variables('computedSubnet2Name')]" },
           "subnet2AddressSpace": { "value": "[parameters('subnet2AddressSpace')]" },
-          "networkSecurityGroupName": { "value": "[parameters('networkSecurityGroupName')]" },
-          "ExternalnetworkSecurityGroupName": { "value": "[parameters('ExternalnetworkSecurityGroupName')]" },
+          "networkSecurityGroupName": { "value": "[variables('computedNetworkSecurityGroupName')]" },
+          "ExternalnetworkSecurityGroupName": { "value": "[variables('computedExternalNetworkSecurityGroupName')]" },
           "yourPublicIpAddress": {"value": "[parameters('yourPublicIpAddress')]"},
           "dnsServers": {
             "value": [
@@ -344,7 +361,7 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "vmName": { "value": "[parameters('remoteDesktopGatewayName')]" },
+          "vmName": { "value": "[variables('computedRemoteDesktopGatewayName')]" },
           "vmSize": { "value": "[parameters('remoteDesktopGatewaySize')]" },
           "adminUsername": { "value": "[parameters('adminUsername')]" },
           "adminPassword": { "value": "[variables('passwordValidation')]" },
@@ -369,7 +386,7 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "vmName": { "value": "[parameters('adfsServerName')]" },
+          "vmName": { "value": "[variables('computedAdfsServerName')]" },
           "vmSize": { "value": "[parameters('adfsServerSize')]" },
           "adminUsername": { "value": "[parameters('adminUsername')]" },
           "adminPassword": { "value": "[variables('passwordValidation')]" },
@@ -396,7 +413,7 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "vmName": { "value": "[parameters('adfsServerName')]" },
+          "vmName": { "value": "[variables('computedAdfsServerName')]" },
           "domainToJoin": { "value": "[parameters('adDSdomainName')]" },
           "domainUserName": { "value": "[parameters('adminUserName')]" },
           "domainPassword": { "value": "[variables('passwordValidation')]" }
@@ -417,7 +434,7 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "vmName": { "value": "[parameters('dirSyncServerName')]" },
+          "vmName": { "value": "[variables('computedDirSyncServerName')]" },
           "vmSize": { "value": "[parameters('dirSyncServerSize')]" },
           "adminUsername": { "value": "[parameters('adminUsername')]" },
           "adminPassword": { "value": "[variables('passwordValidation')]" },
@@ -444,7 +461,7 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "vmName": { "value": "[parameters('dirSyncServerName')]" },
+          "vmName": { "value": "[variables('computedDirSyncServerName')]" },
           "domainToJoin": { "value": "[parameters('adDSdomainName')]" },
           "domainUserName": { "value": "[parameters('adminUserName')]" },
           "domainPassword": { "value": "[variables('passwordValidation')]" }
