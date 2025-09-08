@@ -66,6 +66,20 @@ ReproLabV2/
 
 ## Enhancements
 
+### Enhancement 1: Managed Disks & Storage Type Selection ✅
+**Completed**: 2025-09-07
+- **Removed Storage Account Dependency**: Eliminated the need for a separate storage account
+- **Converted to Managed Disks**: All VMs now use Azure managed disks instead of VHD files
+- **Added Disk Type Parameter**: Users can choose between:
+  - `Standard_LRS` (Standard HDD) - Best cost for lab environments
+  - `StandardSSD_LRS` (Standard SSD) - Better performance when needed
+- **Updated ARM Templates**: Modernized all VM templates to use latest API versions (2019-07-01)
+- **Benefits**: 
+  - Reduced deployment complexity and cost
+  - Improved reliability and performance
+  - Follows modern Azure best practices
+  - Simplified template structure
+
 
 
 

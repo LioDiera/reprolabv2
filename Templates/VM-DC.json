@@ -19,14 +19,6 @@
       "type": "securestring",
       "defaultValue": null
     },
-    "vmStorageAccountName": {
-      "type": "string",
-      "defaultValue": null
-    },
-    "vmStorageAccountContainerName": {
-      "type": "string",
-      "defaultValue": "vhds"
-    },
     "vmNIcSubnetId": {
       "type": "string",
       "defaultValue": null
@@ -52,6 +44,28 @@
     "OSImage": {
       "type": "string",
       "defaultValue": null
+    },
+    "osDiskType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "StandardSSD_LRS"
+      ],
+      "metadata": {
+        "description": "OS Disk storage type: Standard_LRS (Standard HDD) or StandardSSD_LRS (Standard SSD)"
+      }
+    },
+    "dataDiskType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "StandardSSD_LRS"
+      ],
+      "metadata": {
+        "description": "Data Disk storage type: Standard_LRS (Standard HDD) or StandardSSD_LRS (Standard SSD)"
+      }
     }
   },
 
@@ -65,7 +79,7 @@
     {
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[parameters('vmName')]",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "2019-07-01",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmName'),'-NIC'))]"
@@ -93,8 +107,8 @@
           "osDisk": {
             "name": "[concat(parameters('vmName'),'-osdisk')]",
             "createOption": "FromImage",
-            "vhd": {
-              "uri": "[concat('https', '://', parameters('vmStorageAccountName'), '.blob.core.windows.net/',parameters('vmStorageAccountContainerName'), '/', tolower(parameters('vmName')), 'osdisk.vhd')]"
+            "managedDisk": {
+              "storageAccountType": "[parameters('osDiskType')]"
             },
             "caching": "ReadWrite"
           },
@@ -103,8 +117,8 @@
               "lun": 0,
               "name": "[concat(parameters('vmName'),'-datadisk1')]",
               "createOption": "Empty",
-              "vhd": {
-                "uri": "[concat('https', '://', parameters('vmStorageAccountName'), '.blob.core.windows.net/', parameters('vmStorageAccountContainerName'), '/', tolower(parameters('vmName')), 'datadisk1.vhd')]"
+              "managedDisk": {
+                "storageAccountType": "[parameters('dataDiskType')]"
               },
               "caching": "None",
               "diskSizeGB": "10"
