@@ -242,7 +242,8 @@
     "ADFS-Server-DomainJoin-DeploymentName": "[concat(variables('deploymentName'),'-ADFS-DomainJoin')]",
     "DirSync-DeploymentName": "[concat(variables('deploymentName'),'-DirSync')]",
     "DirSync-DomainJoin-DeploymentName": "[concat(variables('deploymentName'),'-DirSync-DomainJoin')]",
-    "passwordValidation": "[if(equals(parameters('adminPassword'), parameters('adminPasswordConfirm')), parameters('adminPassword'), json('null'))]"
+    "passwordsMatch": "[equals(parameters('adminPassword'), parameters('adminPasswordConfirm'))]",
+    "passwordValidation": "[if(variables('passwordsMatch'), parameters('adminPassword'), div(1, 0))]"
   },
 
   "resources": [
@@ -452,5 +453,14 @@
     }
   ],
 
-  "outputs": {}
+  "outputs": {
+    "passwordValidationResult": {
+      "type": "string",
+      "value": "[if(variables('passwordsMatch'), 'Password validation successful', 'Password validation failed - passwords do not match')]"
+    },
+    "deploymentMessage": {
+      "type": "string", 
+      "value": "ReproLabV2 deployment completed successfully. All VMs are using managed disks and the admin password has been validated."
+    }
+  }
 }
