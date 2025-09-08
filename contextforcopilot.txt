@@ -106,6 +106,34 @@ ReproLabV2/
 
 
 
+### Enhancement 3: Automatic Alias Substitution ✅
+**Completed**: 2025-09-07
+**Status**: Successfully implemented and committed
+- **Single Alias Entry**: Added new 'alias' parameter as single entry point for user identification
+- **Automatic Replacement**: Changed from `<ALIAS>` to `[ALIAS]` pattern for clarity
+- **Computed Variables**: Created variables that automatically replace `[ALIAS]` with user's alias:
+  - `computedVnetName`: `syncnet[ALIAS]` → `syncnetliod2`
+  - `computedDomainControllerName`: `DC1[ALIAS]` → `DC1liod2`
+  - `computedRemoteDesktopGatewayName`: `GW[ALIAS]` → `GWliod2`
+  - `computedAdfsServerName`: `ADFS1[ALIAS]` → `ADFS1liod2`
+  - `computedDirSyncServerName`: `SYNC1[ALIAS]` → `SYNC1liod2`
+  - Plus network security groups and subnet names
+- **Updated All Deployments**: All resource deployments now use computed variables
+- **Better UX**: Users can see the naming patterns in the UI, understand what will be created
+- **Flexibility Maintained**: Users can still override individual parameter values if needed
+- **Benefits**: 
+  - Eliminates tedious manual find/replace process
+  - Reduces human error in resource naming
+  - Provides clear naming conventions
+  - Maintains template readability
+  - Single point of customization for user identity
+- **Git Commit**: 35b2cf8 - "feat: Add automatic alias substitution for resource names"
+
+## Enhancements Completed Summary
+1. **✅ Managed Disks & Storage Type Selection** - Modernized storage, removed dependencies
+2. **✅ Password Confirmation & Validation** - Enhanced security, prevents typos  
+3. **✅ Automatic Alias Substitution** - Simplified user experience, single alias entry
+
 ## Technical Notes
 - **ARM Template Version**: 2019-04-01 schema
 - **Default Network**: 10.0.0.0/23 (split into /24 subnets)
@@ -128,15 +156,16 @@ E:\Repos\ReproLabV2
 ## Git Status
 - Repository: ReproLabV2 (local)
 - Branch: master
-- Last Commit: Initial commit with enhanced README (7428595)
-- Status: Ready for enhancements
+- Last Commit: feat: Add automatic alias substitution for resource names (35b2cf8)
+- Status: Ready for next enhancement
 
 ## Next Session Goals
 When resuming work:
-1. Review the enhancements list with the user to understand what has been completed. 
-2. Update this context file with progress
+1. Review completed enhancements with user
+2. Discuss potential next enhancements (monitoring, additional VM sizes, security features, etc.)
+3. Update this context file with any new progress
 
 ---
 **Last Updated**: 2025-09-07
-**Session**: Initial setup and planning
-**Status**: Ready for development
+**Session**: Enhanced alias functionality - Enhancement #3 completed
+**Status**: Three major enhancements completed, ready for next feature
