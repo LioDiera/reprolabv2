@@ -1,0 +1,146 @@
+# ReproLabV2 - Context Guide for GitHub Copilot
+
+## Project Overview
+ReproLabV2 is an enhanced Azure Resource Manager (ARM) template for creating hybrid authentication testing lab environments. This is a modernized version of the original ReproLab with significant improvements in flexibility, security, and usability.
+
+## Project History
+- **Original Source**: Forked from mbakunas/azure-ad-sso-lab and dakoer/Synlab
+- **ReproLab V1**: Added OS version selection, VM sizing options, and public IP restrictions
+- **ReproLabV2**: Created as separate repository for major enhancements and modernization
+
+## Current Architecture
+The template deploys a 4-VM lab environment:
+1. **Remote Desktop Jump Server/ADFS Proxy** (external subnet)
+2. **Domain Controller** (internal subnet) - runs AD DS with pre-populated test data
+3. **ADFS Farm Server** (internal subnet) - for federation services
+4. **Synchronization Server** (internal subnet) - for Azure AD Connect
+
+### Key Features Implemented
+- **Multi-OS Support**: Windows Server 2012 R2, 2016, 2019, 2022, 2025
+- **Flexible VM Sizing**: Standard_B2s, Standard_DS1_v2, Standard_D2s_v3
+- **Enhanced Security**: Public IP restriction for RDP access
+- **Pre-configured AD**: 25+ test users across 4 departments with realistic org structure
+- **Network Segmentation**: External and internal subnets with appropriate NSG rules
+
+## Repository Structure
+`
+ReproLabV2/
+├── azuredeploy.json          # Main ARM template
+├── README.md                 # Enhanced documentation
+├── contextforcopilot.txt     # This file - project context
+├── DSC/                      # PowerShell DSC configurations
+│   ├── MakeDC.ps1.zip       # Domain controller setup
+│   ├── MakeDC.psd1          # Test user data
+│   ├── FormatDisk.ps1.zip   # Disk formatting
+│   └── FormatDisk.psd1      # Disk config
+├── Templates/                # Modular ARM templates
+│   ├── VM-DC.json           # Domain controller VM
+│   ├── VM.json              # Standard VM template
+│   ├── VM-domain-join.json  # Domain join extension
+│   ├── VM-data-disk.json    # Data disk template
+│   ├── VM-publicIP.json     # Public IP template
+│   ├── VNet-2-subnet.json   # Network template
+│   ├── VNet-2-subnet-custom-DNS.json
+│   └── StorageAccount.json  # Storage template
+└── docs/                     # Documentation
+    ├── lab-setup.md         # Setup instructions
+    └── index.html           # Basic web page
+`
+
+## Completed Tasks ✅
+
+### Repository Setup
+- [x] Created ReproLabV2 as new repository (2025-09-07)
+- [x] Copied all files from original ReproLab
+- [x] Enhanced README.md with V2 features and roadmap
+- [x] Initialized git repository with initial commit
+- [x] Created this context file for project tracking
+
+### Existing Features (from V1)
+- [x] Multiple Windows Server OS versions (2012 R2 - 2025)
+- [x] Three VM size options for cost/performance flexibility
+- [x] Public IP restriction parameter for enhanced security
+- [x] Modular ARM template structure
+- [x] PowerShell DSC for automated configuration
+- [x] Pre-populated Active Directory with test users
+
+## Planned Enhancements 🚧
+
+### High Priority (Not Started)
+- [ ] **Modernize Authentication Scenarios**
+  - [ ] Add support for modern authentication protocols
+  - [ ] Include Conditional Access testing scenarios
+  - [ ] Add MFA simulation capabilities
+
+- [ ] **Improve Deployment Experience**
+  - [ ] Add parameter validation and better defaults
+  - [ ] Create deployment scripts/automation
+  - [ ] Add pre-deployment validation checks
+
+- [ ] **Enhanced Monitoring & Logging**
+  - [ ] Integrate Azure Monitor/Log Analytics
+  - [ ] Add performance counters and diagnostics
+  - [ ] Create dashboards for lab monitoring
+
+- [ ] **Cost Optimization**
+  - [ ] Add auto-shutdown schedules
+  - [ ] Implement VM dealocation policies
+  - [ ] Add cost estimation guidance
+
+- [ ] **Security Enhancements**
+  - [ ] Implement Just-In-Time (JIT) access
+  - [ ] Add Azure Security Center integration
+  - [ ] Enhance network security rules
+
+### Medium Priority (Future)
+- [ ] **Documentation Improvements**
+  - [ ] Create detailed troubleshooting guide
+  - [ ] Add video tutorials or walkthroughs
+  - [ ] Document common scenarios and use cases
+
+- [ ] **Integration Features**
+  - [ ] Add Azure DevOps integration examples
+  - [ ] Include CI/CD pipeline templates
+  - [ ] Add backup/restore procedures
+
+- [ ] **Advanced Scenarios**
+  - [ ] Multi-forest trust scenarios
+  - [ ] Cross-cloud authentication testing
+  - [ ] Legacy application integration
+
+## Technical Notes
+- **ARM Template Version**: 2019-04-01 schema
+- **Default Network**: 10.0.0.0/23 (split into /24 subnets)
+- **Default Domain**: synclab.local
+- **Test User Password**: Passw0rd! (lab environment only)
+- **Default VM Size**: Standard_DS1_v2
+- **Default OS**: Windows Server 2019 Datacenter
+
+## Development Guidelines
+1. **Always update this context file** when completing tasks
+2. **Test deployments** before marking tasks complete
+3. **Update README.md** when adding new features
+4. **Follow ARM template best practices** for all changes
+5. **Maintain backward compatibility** where possible
+6. **Document breaking changes** clearly
+
+## Current Working Directory
+E:\Repos\ReproLabV2
+
+## Git Status
+- Repository: ReproLabV2 (local)
+- Branch: master
+- Last Commit: Initial commit with enhanced README (7428595)
+- Status: Ready for enhancements
+
+## Next Session Goals
+When resuming work:
+1. Review the planned enhancements list with the user
+2. Prioritize which features to implement first
+3. Begin implementation of selected enhancements
+4. Update this context file with progress
+
+---
+**Last Updated**: 2025-09-07
+**Session**: Initial setup and planning
+**Status**: Ready for development
