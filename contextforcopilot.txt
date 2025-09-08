@@ -79,6 +79,7 @@ ReproLabV2/
   - Improved reliability and performance
   - Follows modern Azure best practices
   - Simplified template structure
+- **Fixed GitHub URL**: Corrected repository name case and branch reference for proper template linking
 
 
 
