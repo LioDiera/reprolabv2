@@ -71,11 +71,19 @@
     },
     "adminPassword": {
       "type": "securestring",
-      "minLength": 0,
+      "minLength": 12,
+      "maxLength": 123,
       "metadata": {
-        "description": "The local administrator password on the VMs created"
-      },
-      "defaultValue": ""
+        "description": "Administrator password for all VMs. Must be 12-123 characters and contain 3 of: uppercase, lowercase, numbers, special characters."
+      }
+    },
+    "adminPasswordConfirm": {
+      "type": "securestring",
+      "minLength": 12,
+      "maxLength": 123,
+      "metadata": {
+        "description": "Confirm the administrator password by entering it again exactly as above."
+      }
     },
     "domainControllerName": {
       "type": "string",
@@ -233,7 +241,8 @@
     "ADFS-Server-DeploymentName": "[concat(variables('deploymentName'),'-ADFS')]",
     "ADFS-Server-DomainJoin-DeploymentName": "[concat(variables('deploymentName'),'-ADFS-DomainJoin')]",
     "DirSync-DeploymentName": "[concat(variables('deploymentName'),'-DirSync')]",
-    "DirSync-DomainJoin-DeploymentName": "[concat(variables('deploymentName'),'-DirSync-DomainJoin')]"
+    "DirSync-DomainJoin-DeploymentName": "[concat(variables('deploymentName'),'-DirSync-DomainJoin')]",
+    "passwordValidation": "[if(equals(parameters('adminPassword'), parameters('adminPasswordConfirm')), parameters('adminPassword'), json('null'))]"
   },
 
   "resources": [
@@ -278,7 +287,7 @@
           "vmName": { "value": "[parameters('domainControllerName')]" },
           "vmSize": { "value": "[parameters('domainControllerSize')]" },
           "adminUsername": { "value": "[parameters('adminUsername')]" },
-          "adminPassword": { "value": "[parameters('adminPassword')]" },
+          "adminPassword": { "value": "[variables('passwordValidation')]" },
           "vmNIcSubnetId": { "value": "[reference(variables('Network-AzureDNS-DeploymentName')).outputs.Subnet2.value]" },
           "dscLocation": { "value": "[variables('dscLocationURI')]" },
           "domainName": { "value": "[parameters('adDSdomainName')]" },
@@ -337,7 +346,7 @@
           "vmName": { "value": "[parameters('remoteDesktopGatewayName')]" },
           "vmSize": { "value": "[parameters('remoteDesktopGatewaySize')]" },
           "adminUsername": { "value": "[parameters('adminUsername')]" },
-          "adminPassword": { "value": "[parameters('adminPassword')]" },
+          "adminPassword": { "value": "[variables('passwordValidation')]" },
           "vmNIcSubnetId": { "value": "[reference(variables('Network-CustomDNS-DeploymentName')).outputs.Subnet1.value]" },
           "remoteDesktopGatewayIpAddress": { "value": "[parameters('remoteDesktopGatewayIpAddress')]" },
           "OSImage": { "value": "[parameters('OSImage')]" },
@@ -362,7 +371,7 @@
           "vmName": { "value": "[parameters('adfsServerName')]" },
           "vmSize": { "value": "[parameters('adfsServerSize')]" },
           "adminUsername": { "value": "[parameters('adminUsername')]" },
-          "adminPassword": { "value": "[parameters('adminPassword')]" },
+          "adminPassword": { "value": "[variables('passwordValidation')]" },
           "vmNIcSubnetId": { "value": "[reference(variables('Network-CustomDNS-DeploymentName')).outputs.Subnet2.value]" },
           "vmDataDiskSize": { "value": "[parameters('adfsServerDataDiskSize')]" },
           "dscLocation": { "value": "[variables('dscLocationURI')]" },
@@ -389,7 +398,7 @@
           "vmName": { "value": "[parameters('adfsServerName')]" },
           "domainToJoin": { "value": "[parameters('adDSdomainName')]" },
           "domainUserName": { "value": "[parameters('adminUserName')]" },
-          "domainPassword": { "value": "[parameters('adminPassword')]" }
+          "domainPassword": { "value": "[variables('passwordValidation')]" }
         }
       }
     },
@@ -410,7 +419,7 @@
           "vmName": { "value": "[parameters('dirSyncServerName')]" },
           "vmSize": { "value": "[parameters('dirSyncServerSize')]" },
           "adminUsername": { "value": "[parameters('adminUsername')]" },
-          "adminPassword": { "value": "[parameters('adminPassword')]" },
+          "adminPassword": { "value": "[variables('passwordValidation')]" },
           "vmNIcSubnetId": { "value": "[reference(variables('Network-CustomDNS-DeploymentName')).outputs.Subnet2.value]" },
           "vmDataDiskSize": { "value": "[parameters('dirSyncServerDataDiskSize')]" },
           "dscLocation": { "value": "[variables('dscLocationURI')]" },
@@ -437,7 +446,7 @@
           "vmName": { "value": "[parameters('dirSyncServerName')]" },
           "domainToJoin": { "value": "[parameters('adDSdomainName')]" },
           "domainUserName": { "value": "[parameters('adminUserName')]" },
-          "domainPassword": { "value": "[parameters('adminPassword')]" }
+          "domainPassword": { "value": "[variables('passwordValidation')]" }
         }
       }
     }
