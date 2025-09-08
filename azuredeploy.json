@@ -8,7 +8,7 @@
       "metadata": {
         "description": "The location of resources, such as templates and DSC modules, that the template depends on"
       },
-      "defaultValue": "https://raw.githubusercontent.com/LioDiera/ReproLabV2/main/"
+      "defaultValue": "https://raw.githubusercontent.com/LioDiera/reprolabv2/master/"
     },
     "vnetName": {
       "type": "string",
