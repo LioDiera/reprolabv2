@@ -20,10 +20,10 @@
     },
     "vnetName": {
       "type": "string",
-      "defaultValue": "syncnet<ALIAS>",
       "metadata": {
-        "description": "The name of the virtual network to create"
-      }
+        "description": "The name of the virtual network to create. Leave empty to use default: syncnet + your alias"
+      },
+      "defaultValue": ""
     },
     "vnetAddressSpace": {
       "type": "string",
@@ -35,9 +35,9 @@
     "subnet1Name": {
       "type": "string",
       "metadata": {
-        "description": "The name of the subnet created in the new VNet"
+        "description": "The name of the subnet created in the new VNet. Leave empty to use default: ExtraNet + your alias"
       },
-      "defaultValue": "ExtraNet<ALIAS>"
+      "defaultValue": ""
     },
     "subnet1AddressSpace": {
       "type": "string",
@@ -48,7 +48,10 @@
     },
     "subnet2Name": {
       "type": "string",
-      "defaultValue": "CorpNet<ALIAS>"
+      "metadata": {
+        "description": "The name of the second subnet created in the new VNet. Leave empty to use default: CorpNet + your alias"
+      },
+      "defaultValue": ""
     },
     "subnet2AddressSpace": {
       "type": "string",
@@ -56,11 +59,17 @@
     },
     "networkSecurityGroupName": {
       "type": "string",
-      "defaultValue": "Int-SyncLabNSG<ALIAS>"
+      "metadata": {
+        "description": "The name of the internal network security group. Leave empty to use default: Int-SyncLabNSG + your alias"
+      },
+      "defaultValue": ""
     },
     "externalnetworkSecurityGroupName": {
       "type": "string",
-      "defaultValue": "Ext-SyncLabNSG<ALIAS>"
+      "metadata": {
+        "description": "The name of the external network security group. Leave empty to use default: Ext-SyncLabNSG + your alias"
+      },
+      "defaultValue": ""
     },
         "yourPublicIpAddress": {
       "type": "string",
@@ -96,9 +105,9 @@
     "domainControllerName": {
       "type": "string",
       "metadata": {
-        "description": "The name of the VM hosting AD DS"
+        "description": "The name of the VM hosting AD DS. Leave empty to use default: DC1 + your alias"
       },
-      "defaultValue": "DC1<ALIAS>",
+      "defaultValue": "",
       "maxLength": 15
     },
     "domainControllerSize": {
@@ -130,9 +139,9 @@
     "remoteDesktopGatewayName": {
       "type": "string",
       "metadata": {
-        "description": "The name of the remote desktop VM"
+        "description": "The name of the remote desktop VM. Leave empty to use default: GW + your alias"
       },
-      "defaultValue": "GW<ALIAS>",
+      "defaultValue": "",
       "maxLength": 15
     },
     "remoteDesktopGatewaySize": {
@@ -157,9 +166,9 @@
     "adfsServerName": {
       "type": "string",
       "metadata": {
-        "description": "The name of the VM hosting the first server in the ADFS farm"
+        "description": "The name of the VM hosting the first server in the ADFS farm. Leave empty to use default: ADFS1 + your alias"
       },
-      "defaultValue": "ADFS1<ALIAS>",
+      "defaultValue": "",
       "maxLength": 15
     },
     "adfsServerSize": {
@@ -184,9 +193,9 @@
     "dirSyncServerName": {
       "type": "string",
       "metadata": {
-        "description": "The name of the synchronization engine VM (Azure AD Connect will be run on this VM)"
+        "description": "The name of the synchronization engine VM (Azure AD Connect will be run on this VM). Leave empty to use default: SYNC1 + your alias"
       },
-      "defaultValue": "SYNC1<ALIAS>",
+      "defaultValue": "",
       "maxLength": 15
     },
     "dirSyncServerSize": {
@@ -252,15 +261,15 @@
     "DirSync-DomainJoin-DeploymentName": "[concat(variables('deploymentName'),'-DirSync-DomainJoin')]",
     "passwordsMatch": "[equals(parameters('adminPassword'), parameters('adminPasswordConfirm'))]",
     "passwordValidation": "[if(variables('passwordsMatch'), parameters('adminPassword'), div(1, 0))]",
-    "computedVnetName": "[replace(parameters('vnetName'), '<ALIAS>', parameters('alias'))]",
-    "computedSubnet1Name": "[replace(parameters('subnet1Name'), '<ALIAS>', parameters('alias'))]",
-    "computedSubnet2Name": "[replace(parameters('subnet2Name'), '<ALIAS>', parameters('alias'))]",
-    "computedNetworkSecurityGroupName": "[replace(parameters('networkSecurityGroupName'), '<ALIAS>', parameters('alias'))]",
-    "computedExternalNetworkSecurityGroupName": "[replace(parameters('externalnetworkSecurityGroupName'), '<ALIAS>', parameters('alias'))]",
-    "computedDomainControllerName": "[replace(parameters('domainControllerName'), '<ALIAS>', parameters('alias'))]",
-    "computedRemoteDesktopGatewayName": "[replace(parameters('remoteDesktopGatewayName'), '<ALIAS>', parameters('alias'))]",
-    "computedAdfsServerName": "[replace(parameters('adfsServerName'), '<ALIAS>', parameters('alias'))]",
-    "computedDirSyncServerName": "[replace(parameters('dirSyncServerName'), '<ALIAS>', parameters('alias'))]"
+    "computedVnetName": "[if(empty(parameters('vnetName')), concat('syncnet', parameters('alias')), parameters('vnetName'))]",
+    "computedSubnet1Name": "[if(empty(parameters('subnet1Name')), concat('ExtraNet', parameters('alias')), parameters('subnet1Name'))]",
+    "computedSubnet2Name": "[if(empty(parameters('subnet2Name')), concat('CorpNet', parameters('alias')), parameters('subnet2Name'))]",
+    "computedNetworkSecurityGroupName": "[if(empty(parameters('networkSecurityGroupName')), concat('Int-SyncLabNSG', parameters('alias')), parameters('networkSecurityGroupName'))]",
+    "computedExternalNetworkSecurityGroupName": "[if(empty(parameters('externalnetworkSecurityGroupName')), concat('Ext-SyncLabNSG', parameters('alias')), parameters('externalnetworkSecurityGroupName'))]",
+    "computedDomainControllerName": "[if(empty(parameters('domainControllerName')), concat('DC1', parameters('alias')), parameters('domainControllerName'))]",
+    "computedRemoteDesktopGatewayName": "[if(empty(parameters('remoteDesktopGatewayName')), concat('GW', parameters('alias')), parameters('remoteDesktopGatewayName'))]",
+    "computedAdfsServerName": "[if(empty(parameters('adfsServerName')), concat('ADFS1', parameters('alias')), parameters('adfsServerName'))]",
+    "computedDirSyncServerName": "[if(empty(parameters('dirSyncServerName')), concat('SYNC1', parameters('alias')), parameters('dirSyncServerName'))]"
   },
 
   "resources": [
