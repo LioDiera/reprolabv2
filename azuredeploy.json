@@ -110,18 +110,6 @@
       "defaultValue": "DC1[ALIAS]",
       "maxLength": 15
     },
-    "domainControllerSize": {
-      "type": "string",
-      "allowedValues": [
-        "Standard_D2s_v3",
-        "Standard_DS1_v2",
-        "Standard_B2s"
-      ],
-      "metadata": {
-        "description": "The size of the VM hosting AD DS"
-      },
-      "defaultValue": "Standard_DS1_v2"
-    },
     "domainControllerIpAddress": {
       "type": "string",
       "metadata": {
@@ -144,18 +132,6 @@
       "defaultValue": "GW[ALIAS]",
       "maxLength": 15
     },
-    "remoteDesktopGatewaySize": {
-      "type": "string",
-      "allowedValues": [
-        "Standard_D2s_v3",
-        "Standard_DS1_v2",
-        "Standard_B2s"
-      ],
-      "metadata": {
-        "description": "The size of the remote desktop VM"
-      },
-      "defaultValue": "Standard_DS1_v2"
-    },
       "remoteDesktopGatewayIpAddress": {
       "type": "string",
       "metadata": {
@@ -171,18 +147,6 @@
       "defaultValue": "ADFS1[ALIAS]",
       "maxLength": 15
     },
-    "adfsServerSize": {
-      "type": "string",
-      "allowedValues": [
-        "Standard_D2s_v3",
-        "Standard_DS1_v2",
-        "Standard_B2s"
-      ],
-      "metadata": {
-        "description": "The size of the VM hosting the first server in the ADFS farm"
-      },
-      "defaultValue": "Standard_DS1_v2"
-    },
     "adfsServerDataDiskSize": {
       "type": "string",
       "metadata": {
@@ -197,18 +161,6 @@
       },
       "defaultValue": "SYNC1[ALIAS]",
       "maxLength": 15
-    },
-    "dirSyncServerSize": {
-      "type": "string",
-      "allowedValues": [
-        "Standard_D2s_v3",
-        "Standard_DS1_v2",
-        "Standard_B2s"
-      ],
-      "metadata": {
-        "description": "The size of the synchronization engine VM"
-      },
-      "defaultValue": "Standard_DS1_v2"
     },
     "dirSyncServerDataDiskSize": {
       "type": "string",
@@ -244,6 +196,18 @@
       "metadata": {
         "description": "Disk storage type for all VMs: Standard_LRS (Standard HDD) for best cost or StandardSSD_LRS (Standard SSD) for better performance"
       }
+    },
+    "vmSize": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_D2s_v3",
+        "Standard_DS1_v2",
+        "Standard_B2s"
+      ],
+      "metadata": {
+        "description": "VM size for all virtual machines in the lab"
+      },
+      "defaultValue": "Standard_DS1_v2"
     }
   },
 
@@ -312,7 +276,7 @@
         },
         "parameters": {
           "vmName": { "value": "[variables('computedDomainControllerName')]" },
-          "vmSize": { "value": "[parameters('domainControllerSize')]" },
+          "vmSize": { "value": "[parameters('vmSize')]" },
           "adminUsername": { "value": "[parameters('adminUsername')]" },
           "adminPassword": { "value": "[variables('passwordValidation')]" },
           "vmNIcSubnetId": { "value": "[reference(variables('Network-AzureDNS-DeploymentName')).outputs.Subnet2.value]" },
@@ -371,7 +335,7 @@
         },
         "parameters": {
           "vmName": { "value": "[variables('computedRemoteDesktopGatewayName')]" },
-          "vmSize": { "value": "[parameters('remoteDesktopGatewaySize')]" },
+          "vmSize": { "value": "[parameters('vmSize')]" },
           "adminUsername": { "value": "[parameters('adminUsername')]" },
           "adminPassword": { "value": "[variables('passwordValidation')]" },
           "vmNIcSubnetId": { "value": "[reference(variables('Network-CustomDNS-DeploymentName')).outputs.Subnet1.value]" },
@@ -396,7 +360,7 @@
         },
         "parameters": {
           "vmName": { "value": "[variables('computedAdfsServerName')]" },
-          "vmSize": { "value": "[parameters('adfsServerSize')]" },
+          "vmSize": { "value": "[parameters('vmSize')]" },
           "adminUsername": { "value": "[parameters('adminUsername')]" },
           "adminPassword": { "value": "[variables('passwordValidation')]" },
           "vmNIcSubnetId": { "value": "[reference(variables('Network-CustomDNS-DeploymentName')).outputs.Subnet2.value]" },
@@ -444,7 +408,7 @@
         },
         "parameters": {
           "vmName": { "value": "[variables('computedDirSyncServerName')]" },
-          "vmSize": { "value": "[parameters('dirSyncServerSize')]" },
+          "vmSize": { "value": "[parameters('vmSize')]" },
           "adminUsername": { "value": "[parameters('adminUsername')]" },
           "adminPassword": { "value": "[variables('passwordValidation')]" },
           "vmNIcSubnetId": { "value": "[reference(variables('Network-CustomDNS-DeploymentName')).outputs.Subnet2.value]" },
