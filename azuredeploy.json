@@ -207,7 +207,7 @@
       "metadata": {
         "description": "VM size for all virtual machines in the lab"
       },
-      "defaultValue": "Standard_DS1_v2"
+      "defaultValue": "Standard_B2s"
     }
   },
 
