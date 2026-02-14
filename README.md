@@ -12,12 +12,6 @@ This template will deploy a comprehensive Windows Server lab environment (2012 R
 - **Enhanced Security**: Restrict RDP access to your specific public IP address
 - **Cost Optimization**: Choose appropriate VM sizes for your budget and performance requirements
 
-### Planned Enhancements (Coming Soon)
-- Additional modern authentication scenarios
-- Improved automation and deployment experience
-- Enhanced monitoring and logging capabilities
-- Better integration with modern Azure services
-
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3a%2f%2fraw.githubusercontent.com%2fLioDiera%2freprolabv2%2fmaster%2fazuredeploy.json" target="_blank">
     <img src="https://aka.ms/deploytoazurebutton"/>
 </a>

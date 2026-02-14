@@ -51,10 +51,45 @@
   },
 
   "variables": {
-    "apiVersion": "2016-03-30"
+    "apiVersion": "2016-03-30",
+    "natGatewayName": "[concat(parameters('vnetName'), '-natgw')]",
+    "natGatewayPublicIpName": "[concat(parameters('vnetName'), '-natgw-pip')]"
   },
 
   "resources": [
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2021-05-01",
+      "name": "[variables('natGatewayPublicIpName')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "publicIPAddressVersion": "IPv4"
+      }
+    },
+    {
+      "type": "Microsoft.Network/natGateways",
+      "apiVersion": "2021-05-01",
+      "name": "[variables('natGatewayName')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "Standard"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('natGatewayPublicIpName'))]"
+      ],
+      "properties": {
+        "publicIpAddresses": [
+          {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('natGatewayPublicIpName'))]"
+          }
+        ],
+        "idleTimeoutInMinutes": 4
+      }
+    },
     {
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[parameters('vnetName')]",
@@ -62,7 +97,8 @@
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
-        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('externalnetworkSecurityGroupName'))]"
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('externalnetworkSecurityGroupName'))]",
+        "[resourceId('Microsoft.Network/natGateways', variables('natGatewayName'))]"
       ],
       "properties": {
         "addressSpace": {
@@ -89,6 +125,9 @@
               "addressPrefix": "[parameters('subnet2AddressSpace')]",
               "networkSecurityGroup": {
                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+              },
+              "natGateway": {
+                "id": "[resourceId('Microsoft.Network/natGateways', variables('natGatewayName'))]"
               }
             }
           }
