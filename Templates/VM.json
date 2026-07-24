@@ -94,7 +94,7 @@
     {
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(parameters('vmName'),'-NIC')]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2021-02-01",
       "location": "[resourceGroup().location]",
       "properties": {
         "ipConfigurations": [

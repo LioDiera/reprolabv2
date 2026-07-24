@@ -51,7 +51,7 @@
   },
 
   "variables": {
-    "apiVersion": "2016-03-30",
+    "apiVersion": "2021-02-01",
     "natGatewayName": "[concat(parameters('vnetName'), '-natgw')]",
     "natGatewayPublicIpName": "[concat(parameters('vnetName'), '-natgw-pip')]"
   },
