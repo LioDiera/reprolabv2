@@ -1,0 +1,211 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+
+  "parameters": {
+    "alias": {
+      "type": "string",
+      "metadata": {
+        "description": "Your unique alias/identifier used in the existing lab (e.g., 'liod1'). Must match the alias used when deploying the original lab."
+      },
+      "maxLength": 8,
+      "minLength": 1
+    },
+    "assetLocationURI": {
+      "type": "string",
+      "metadata": {
+        "description": "The location of resources, such as templates, that the template depends on. Leave as default unless using a fork."
+      },
+      "defaultValue": "https://raw.githubusercontent.com/LioDiera/reprolabv2/master/"
+    },
+    "vmName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for the new VM. Use [ALIAS] as a placeholder for your alias."
+      },
+      "defaultValue": "EXTRA1[ALIAS]",
+      "maxLength": 15
+    },
+    "vnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing virtual network to attach the VM to. Use [ALIAS] as a placeholder."
+      },
+      "defaultValue": "syncnet[ALIAS]"
+    },
+    "vnetResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource group where the existing virtual network lives. Leave blank to use the same resource group as this deployment."
+      },
+      "defaultValue": ""
+    },
+    "subnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the subnet within the existing VNet to attach the VM to. Use [ALIAS] as a placeholder."
+      },
+      "defaultValue": "CorpNet[ALIAS]"
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Local administrator username for the new VM."
+      },
+      "defaultValue": "LabAdmin"
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "minLength": 12,
+      "maxLength": 123,
+      "metadata": {
+        "description": "Administrator password for the new VM. Must be 12-123 characters and contain 3 of: uppercase, lowercase, numbers, special characters."
+      }
+    },
+    "adminPasswordConfirm": {
+      "type": "securestring",
+      "minLength": 12,
+      "maxLength": 123,
+      "metadata": {
+        "description": "Confirm the administrator password by entering it again exactly as above."
+      }
+    },
+    "joinDomain": {
+      "type": "bool",
+      "metadata": {
+        "description": "Whether to join the new VM to the existing Active Directory domain."
+      },
+      "defaultValue": true
+    },
+    "adDSdomainName": {
+      "type": "string",
+      "metadata": {
+        "description": "The FQDN of the existing AD DS domain to join. Only required when Join Domain is true."
+      },
+      "defaultValue": "synclab.local"
+    },
+    "domainAdminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Username of an account with domain join rights. Only required when Join Domain is true."
+      },
+      "defaultValue": "LabAdmin"
+    },
+    "domainAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for the domain admin account. Only required when Join Domain is true."
+      },
+      "defaultValue": ""
+    },
+    "OSImage": {
+      "type": "string",
+      "minLength": 1,
+      "allowedValues": [
+        "2012-R2-Datacenter",
+        "2012-Datacenter",
+        "2016-Datacenter",
+        "2019-Datacenter",
+        "2022-Datacenter",
+        "2025-Datacenter"
+      ],
+      "metadata": {
+        "description": "The Windows Server OS version for the new VM."
+      },
+      "defaultValue": "2019-Datacenter"
+    },
+    "vmSize": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_D2s_v3",
+        "Standard_DS1_v2",
+        "Standard_B2s"
+      ],
+      "metadata": {
+        "description": "VM size for the new virtual machine."
+      },
+      "defaultValue": "Standard_B2s"
+    },
+    "diskStorageType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "StandardSSD_LRS"
+      ],
+      "metadata": {
+        "description": "Disk storage type: Standard_LRS (Standard HDD) for best cost or StandardSSD_LRS (Standard SSD) for better performance."
+      }
+    }
+  },
+
+  "variables": {
+    "computedVmName": "[replace(parameters('vmName'), '[ALIAS]', parameters('alias'))]",
+    "computedVnetName": "[replace(parameters('vnetName'), '[ALIAS]', parameters('alias'))]",
+    "computedSubnetName": "[replace(parameters('subnetName'), '[ALIAS]', parameters('alias'))]",
+    "resolvedVnetResourceGroup": "[if(equals(parameters('vnetResourceGroup'), ''), resourceGroup().name, parameters('vnetResourceGroup'))]",
+    "subnetId": "[resourceId(variables('resolvedVnetResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', variables('computedVnetName'), variables('computedSubnetName'))]",
+    "passwordsMatch": "[equals(parameters('adminPassword'), parameters('adminPasswordConfirm'))]",
+    "passwordValidation": "[if(variables('passwordsMatch'), parameters('adminPassword'), div(1, 0))]",
+    "templateLocationURI": "[concat(parameters('assetLocationURI'), 'Templates/')]",
+    "VM-DeploymentName": "[concat(deployment().Name, '-AdditionalVM')]",
+    "DomainJoin-DeploymentName": "[concat(deployment().Name, '-AdditionalVM-DomainJoin')]"
+  },
+
+  "resources": [
+    {
+      "name": "[variables('VM-DeploymentName')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-02-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateLocationURI'), 'VM.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": { "value": "[variables('computedVmName')]" },
+          "vmSize": { "value": "[parameters('vmSize')]" },
+          "adminUsername": { "value": "[parameters('adminUsername')]" },
+          "adminPassword": { "value": "[variables('passwordValidation')]" },
+          "vmNIcSubnetId": { "value": "[variables('subnetId')]" },
+          "OSImage": { "value": "[parameters('OSImage')]" },
+          "osDiskType": { "value": "[parameters('diskStorageType')]" }
+        }
+      }
+    },
+    {
+      "condition": "[parameters('joinDomain')]",
+      "name": "[variables('DomainJoin-DeploymentName')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-02-01",
+      "dependsOn": [
+        "[variables('VM-DeploymentName')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateLocationURI'), 'VM-domain-join.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": { "value": "[variables('computedVmName')]" },
+          "domainToJoin": { "value": "[parameters('adDSdomainName')]" },
+          "domainUsername": { "value": "[parameters('domainAdminUsername')]" },
+          "domainPassword": { "value": "[parameters('domainAdminPassword')]" }
+        }
+      }
+    }
+  ],
+
+  "outputs": {
+    "vmName": {
+      "type": "string",
+      "value": "[variables('computedVmName')]"
+    },
+    "subnetId": {
+      "type": "string",
+      "value": "[variables('subnetId')]"
+    }
+  }
+}
