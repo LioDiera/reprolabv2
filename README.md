@@ -16,8 +16,7 @@ This template will deploy a comprehensive Windows Server lab environment (2012 R
     <img src="https://aka.ms/deploytoazurebutton"/>
 </a>
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3a%2f%2fraw.githubusercontent.com%2fLioDiera%2freprolabv2%2fmaster%2fazuredeploy-additionalvm.json" target="_blank">
-    <img src="https://aka.ms/deploytoazurebutton" alt="Deploy additional VM"/>
-    &nbsp;Deploy additional VM
+    <img src="https://img.shields.io/badge/Deploy_Additional_VM-0078d4?style=for-the-badge&logo=microsoftazure&logoColor=white" alt="Deploy additional VM"/>
 </a>
 
 ## ��️ Architecture
