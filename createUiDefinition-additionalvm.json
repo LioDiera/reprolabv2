@@ -1,0 +1,232 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+  "handler": "Microsoft.Azure.CreateUIDef",
+  "version": "0.1.2-preview",
+  "parameters": {
+    "basics": [
+      {
+        "name": "alias",
+        "type": "Microsoft.Common.TextBox",
+        "label": "Alias",
+        "defaultValue": "",
+        "toolTip": "Your unique alias used in the existing lab (e.g. liod1). Must match the alias from the original lab deployment.",
+        "constraints": {
+          "required": true,
+          "regex": "^[a-zA-Z0-9]{1,8}$",
+          "validationMessage": "Alias must be 1-8 alphanumeric characters."
+        }
+      },
+      {
+        "name": "vmName",
+        "type": "Microsoft.Common.TextBox",
+        "label": "VM Name",
+        "defaultValue": "EXTRA1[ALIAS]",
+        "toolTip": "Name for the new VM. Use [ALIAS] as a placeholder — it will be replaced with your alias.",
+        "constraints": {
+          "required": true,
+          "regex": "^[a-zA-Z0-9\\[\\]]{1,15}$",
+          "validationMessage": "VM name must be 1-15 alphanumeric characters."
+        }
+      },
+      {
+        "name": "adminCredentials",
+        "type": "Microsoft.Compute.CredentialsCombo",
+        "label": {
+          "userName": "Admin Username",
+          "password": "Admin Password",
+          "confirmPassword": "Confirm Password"
+        },
+        "toolTip": {
+          "userName": "Local administrator username for the new VM.",
+          "password": "Password must be 12-123 characters with uppercase, lowercase, and a number."
+        },
+        "defaultValue": {
+          "userName": "LabAdmin"
+        },
+        "osPlatform": "Windows",
+        "constraints": {
+          "required": true,
+          "customPasswordRegex": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d\\W]{12,123}$",
+          "customValidationMessage": "Password must be 12-123 characters with uppercase, lowercase, and a number."
+        },
+        "options": {
+          "hideConfirmation": false
+        }
+      }
+    ],
+    "steps": [
+      {
+        "name": "networkSettings",
+        "label": "Network",
+        "elements": [
+          {
+            "name": "vnetCombo",
+            "type": "Microsoft.Network.VirtualNetworkCombo",
+            "label": {
+              "virtualNetwork": "Virtual Network",
+              "subnets": "Subnet"
+            },
+            "toolTip": {
+              "virtualNetwork": "Select the existing virtual network from your lab deployment.",
+              "subnets": "Select the subnet for the new VM. For domain-joined VMs use the internal subnet (CorpNet[ALIAS])."
+            },
+            "defaultValue": {
+              "name": "syncnet",
+              "addressPrefixSize": "/23"
+            },
+            "constraints": {
+              "minAddressPrefixSize": "/29"
+            },
+            "options": {
+              "hideExisting": false
+            },
+            "subnets": {
+              "subnet1": {
+                "label": "Subnet",
+                "defaultValue": {
+                  "name": "CorpNet",
+                  "addressPrefixSize": "/24"
+                },
+                "constraints": {
+                  "minAddressPrefixSize": "/29",
+                  "minAddressCount": 1,
+                  "requireContiguousAddresses": false
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "vmSettings",
+        "label": "VM Configuration",
+        "elements": [
+          {
+            "name": "osImage",
+            "type": "Microsoft.Common.DropDown",
+            "label": "OS Image",
+            "defaultValue": "2019-Datacenter",
+            "toolTip": "Windows Server version for the new VM.",
+            "constraints": {
+              "required": true,
+              "allowedValues": [
+                { "label": "Windows Server 2012 R2 Datacenter", "value": "2012-R2-Datacenter" },
+                { "label": "Windows Server 2012 Datacenter", "value": "2012-Datacenter" },
+                { "label": "Windows Server 2016 Datacenter", "value": "2016-Datacenter" },
+                { "label": "Windows Server 2019 Datacenter", "value": "2019-Datacenter" },
+                { "label": "Windows Server 2022 Datacenter", "value": "2022-Datacenter" },
+                { "label": "Windows Server 2025 Datacenter", "value": "2025-Datacenter" }
+              ]
+            }
+          },
+          {
+            "name": "vmSize",
+            "type": "Microsoft.Compute.SizeSelector",
+            "label": "VM Size",
+            "toolTip": "Size for the new virtual machine.",
+            "recommendedSizes": [
+              "Standard_B2s",
+              "Standard_DS1_v2",
+              "Standard_D2s_v3"
+            ],
+            "constraints": {
+              "allowedSizes": [
+                "Standard_B2s",
+                "Standard_DS1_v2",
+                "Standard_D2s_v3"
+              ]
+            },
+            "osPlatform": "Windows",
+            "count": 1
+          },
+          {
+            "name": "diskStorageType",
+            "type": "Microsoft.Common.DropDown",
+            "label": "Disk Storage Type",
+            "defaultValue": "Standard_LRS",
+            "toolTip": "Storage type for the OS disk.",
+            "constraints": {
+              "required": true,
+              "allowedValues": [
+                { "label": "Standard HDD (Standard_LRS)", "value": "Standard_LRS" },
+                { "label": "Standard SSD (StandardSSD_LRS)", "value": "StandardSSD_LRS" }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "domainSettings",
+        "label": "Domain Join",
+        "elements": [
+          {
+            "name": "joinDomain",
+            "type": "Microsoft.Common.CheckBox",
+            "label": "Join this VM to an existing domain",
+            "defaultValue": true,
+            "toolTip": "Whether to join the new VM to the existing Active Directory domain."
+          },
+          {
+            "name": "adDSdomainName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Domain FQDN",
+            "defaultValue": "synclab.local",
+            "toolTip": "The FQDN of the existing AD domain to join.",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-zA-Z0-9][a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+              "validationMessage": "Enter a valid domain FQDN (e.g. synclab.local)."
+            },
+            "visible": "[steps('domainSettings').joinDomain]"
+          },
+          {
+            "name": "domainAdminUsername",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Domain Admin Username",
+            "defaultValue": "LabAdmin",
+            "toolTip": "Username of an account with domain join rights.",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-zA-Z0-9._-]{1,64}$",
+              "validationMessage": "Enter a valid username."
+            },
+            "visible": "[steps('domainSettings').joinDomain]"
+          },
+          {
+            "name": "domainAdminPassword",
+            "type": "Microsoft.Common.PasswordBox",
+            "label": {
+              "password": "Domain Admin Password",
+              "confirmPassword": "Confirm Password"
+            },
+            "toolTip": "Password for the domain admin account.",
+            "constraints": {
+              "required": true
+            },
+            "options": {
+              "hideConfirmation": false
+            },
+            "visible": "[steps('domainSettings').joinDomain]"
+          }
+        ]
+      }
+    ],
+    "outputs": {
+      "alias": "[basics('alias')]",
+      "vmName": "[basics('vmName')]",
+      "adminUsername": "[basics('adminCredentials').userName]",
+      "adminPassword": "[basics('adminCredentials').password]",
+      "adminPasswordConfirm": "[basics('adminCredentials').password]",
+      "vnetName": "[steps('networkSettings').vnetCombo.name]",
+      "vnetResourceGroup": "[steps('networkSettings').vnetCombo.resourceGroup]",
+      "subnetName": "[steps('networkSettings').vnetCombo.subnets.subnet1.name]",
+      "OSImage": "[steps('vmSettings').osImage]",
+      "vmSize": "[steps('vmSettings').vmSize]",
+      "diskStorageType": "[steps('vmSettings').diskStorageType]",
+      "joinDomain": "[steps('domainSettings').joinDomain]",
+      "adDSdomainName": "[steps('domainSettings').adDSdomainName]",
+      "domainAdminUsername": "[steps('domainSettings').domainAdminUsername]",
+      "domainAdminPassword": "[steps('domainSettings').domainAdminPassword]"
+    }
+  }
+}
