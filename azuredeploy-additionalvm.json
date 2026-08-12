@@ -3,14 +3,6 @@
   "contentVersion": "1.0.0.0",
 
   "parameters": {
-    "alias": {
-      "type": "string",
-      "metadata": {
-        "description": "Your unique alias/identifier used in the existing lab (e.g., 'liod1'). Must match the alias used when deploying the original lab."
-      },
-      "maxLength": 8,
-      "minLength": 1
-    },
     "assetLocationURI": {
       "type": "string",
       "metadata": {
@@ -21,17 +13,17 @@
     "vmName": {
       "type": "string",
       "metadata": {
-        "description": "Name for the new VM. Use [ALIAS] as a placeholder for your alias."
+        "description": "Name for the new VM."
       },
-      "defaultValue": "EXTRA1[ALIAS]",
+      "defaultValue": "EXTRAVM1",
       "maxLength": 15
     },
     "vnetName": {
       "type": "string",
       "metadata": {
-        "description": "Name of the existing virtual network to attach the VM to. Use [ALIAS] as a placeholder."
+        "description": "Name of the existing virtual network to attach the VM to."
       },
-      "defaultValue": "syncnet[ALIAS]"
+      "defaultValue": "syncnet"
     },
     "vnetResourceGroup": {
       "type": "string",
@@ -43,9 +35,9 @@
     "subnetName": {
       "type": "string",
       "metadata": {
-        "description": "Name of the subnet within the existing VNet to attach the VM to. Use [ALIAS] as a placeholder."
+        "description": "Name of the subnet within the existing VNet to attach the VM to."
       },
-      "defaultValue": "CorpNet[ALIAS]"
+      "defaultValue": "CorpNet"
     },
     "adminUsername": {
       "type": "string",
@@ -140,9 +132,9 @@
   },
 
   "variables": {
-    "computedVmName": "[replace(parameters('vmName'), '[ALIAS]', parameters('alias'))]",
-    "computedVnetName": "[replace(parameters('vnetName'), '[ALIAS]', parameters('alias'))]",
-    "computedSubnetName": "[replace(parameters('subnetName'), '[ALIAS]', parameters('alias'))]",
+    "computedVmName": "[parameters('vmName')]",
+    "computedVnetName": "[parameters('vnetName')]",
+    "computedSubnetName": "[parameters('subnetName')]",
     "resolvedVnetResourceGroup": "[if(equals(parameters('vnetResourceGroup'), ''), resourceGroup().name, parameters('vnetResourceGroup'))]",
     "subnetId": "[resourceId(variables('resolvedVnetResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', variables('computedVnetName'), variables('computedSubnetName'))]",
     "passwordsMatch": "[equals(parameters('adminPassword'), parameters('adminPasswordConfirm'))]",

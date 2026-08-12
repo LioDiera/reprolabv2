@@ -5,26 +5,14 @@
   "parameters": {
     "basics": [
       {
-        "name": "alias",
-        "type": "Microsoft.Common.TextBox",
-        "label": "Alias",
-        "defaultValue": "",
-        "toolTip": "Your unique alias used in the existing lab (e.g. liod1). Must match the alias from the original lab deployment.",
-        "constraints": {
-          "required": true,
-          "regex": "^[a-zA-Z0-9]{1,8}$",
-          "validationMessage": "Alias must be 1-8 alphanumeric characters."
-        }
-      },
-      {
         "name": "vmName",
         "type": "Microsoft.Common.TextBox",
         "label": "VM Name",
-        "defaultValue": "EXTRA1[ALIAS]",
-        "toolTip": "Name for the new VM. Use [ALIAS] as a placeholder — it will be replaced with your alias.",
+        "defaultValue": "EXTRAVM1",
+        "toolTip": "Name for the new VM (max 15 characters).",
         "constraints": {
           "required": true,
-          "regex": "^[a-zA-Z0-9\\[\\]]{1,15}$",
+          "regex": "^[a-zA-Z0-9-]{1,15}$",
           "validationMessage": "VM name must be 1-15 alphanumeric characters."
         }
       },
@@ -212,7 +200,6 @@
       }
     ],
     "outputs": {
-      "alias": "[basics('alias')]",
       "vmName": "[basics('vmName')]",
       "adminUsername": "[basics('adminCredentials').userName]",
       "adminPassword": "[basics('adminCredentials').password]",
