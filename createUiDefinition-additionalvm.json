@@ -17,25 +17,29 @@
         }
       },
       {
-        "name": "adminCredentials",
-        "type": "Microsoft.Compute.CredentialsCombo",
+        "name": "adminUsername",
+        "type": "Microsoft.Common.TextBox",
+        "label": "Admin Username",
+        "defaultValue": "LabAdmin",
+        "toolTip": "Local administrator username for the new VM.",
+        "constraints": {
+          "required": true,
+          "regex": "^[a-zA-Z0-9._-]{1,20}$",
+          "validationMessage": "Username must be 1-20 alphanumeric characters."
+        }
+      },
+      {
+        "name": "adminPassword",
+        "type": "Microsoft.Common.PasswordBox",
         "label": {
-          "userName": "Admin Username",
           "password": "Admin Password",
           "confirmPassword": "Confirm Password"
         },
-        "toolTip": {
-          "userName": "Local administrator username for the new VM.",
-          "password": "Password must be 12-123 characters with uppercase, lowercase, and a number."
-        },
-        "defaultValue": {
-          "userName": "LabAdmin"
-        },
-        "osPlatform": "Windows",
+        "toolTip": "Password must be 12-123 characters with uppercase, lowercase, and a number.",
         "constraints": {
           "required": true,
-          "customPasswordRegex": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d\\W]{12,123}$",
-          "customValidationMessage": "Password must be 12-123 characters with uppercase, lowercase, and a number."
+          "regex": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d\\W]{12,123}$",
+          "validationMessage": "Password must be 12-123 characters with uppercase, lowercase, and a number."
         },
         "options": {
           "hideConfirmation": false
@@ -208,9 +212,9 @@
     ],
     "outputs": {
       "vmName": "[basics('vmName')]",
-      "adminUsername": "[basics('adminCredentials').userName]",
-      "adminPassword": "[basics('adminCredentials').password]",
-      "adminPasswordConfirm": "[basics('adminCredentials').password]",
+      "adminUsername": "[basics('adminUsername')]",
+      "adminPassword": "[basics('adminPassword')]",
+      "adminPasswordConfirm": "[basics('adminPassword')]",
       "addPublicIP": "[steps('networkSettings').addPublicIP]",
       "vnetName": "[steps('networkSettings').vnetCombo.name]",
       "vnetResourceGroup": "[steps('networkSettings').vnetCombo.resourceGroup]",
