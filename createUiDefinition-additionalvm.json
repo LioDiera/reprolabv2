@@ -52,39 +52,28 @@
         "label": "Network",
         "elements": [
           {
-            "name": "vnetCombo",
-            "type": "Microsoft.Network.VirtualNetworkCombo",
-            "label": {
-              "virtualNetwork": "Virtual Network",
-              "subnets": "Subnet"
-            },
-            "toolTip": {
-              "virtualNetwork": "Select the existing virtual network from your lab deployment.",
-              "subnets": "Select the subnet for the new VM. For domain-joined VMs use the internal subnet (CorpNet[ALIAS])."
-            },
-            "defaultValue": {
-              "name": "syncnet",
-              "addressPrefixSize": "/23"
-            },
-            "constraints": {
-              "minAddressPrefixSize": "/29"
-            },
+            "name": "existingVnet",
+            "type": "Microsoft.Solutions.ResourceSelector",
+            "label": "Virtual Network",
+            "toolTip": "Select the existing virtual network from your lab deployment.",
+            "resourceType": "Microsoft.Network/virtualNetworks",
             "options": {
-              "hideExisting": false
-            },
-            "subnets": {
-              "subnet1": {
-                "label": "Subnet",
-                "defaultValue": {
-                  "name": "CorpNet",
-                  "addressPrefixSize": "/24"
-                },
-                "constraints": {
-                  "minAddressPrefixSize": "/29",
-                  "minAddressCount": 1,
-                  "requireContiguousAddresses": false
-                }
+              "filter": {
+                "subscription": "onBasics",
+                "location": "onBasics"
               }
+            }
+          },
+          {
+            "name": "subnetName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Subnet Name",
+            "defaultValue": "",
+            "toolTip": "Name of the subnet within the selected VNet to attach this VM to (e.g. CorpNetliod1 for the internal subnet).",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-zA-Z0-9._-]{1,80}$",
+              "validationMessage": "Enter a valid subnet name."
             }
           },
           {
@@ -216,9 +205,9 @@
       "adminPassword": "[basics('adminPassword')]",
       "adminPasswordConfirm": "[basics('adminPassword')]",
       "addPublicIP": "[steps('networkSettings').addPublicIP]",
-      "vnetName": "[steps('networkSettings').vnetCombo.name]",
-      "vnetResourceGroup": "[steps('networkSettings').vnetCombo.resourceGroup]",
-      "subnetName": "[steps('networkSettings').vnetCombo.subnets.subnet1.name]",
+      "vnetName": "[steps('networkSettings').existingVnet.name]",
+      "vnetResourceGroup": "",
+      "subnetName": "[steps('networkSettings').subnetName]",
       "OSImage": "[steps('vmSettings').osImage]",
       "vmSize": "[steps('vmSettings').vmSize]",
       "diskStorageType": "[steps('vmSettings').diskStorageType]",
