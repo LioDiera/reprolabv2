@@ -82,6 +82,13 @@
                 }
               }
             }
+          },
+          {
+            "name": "addPublicIP",
+            "type": "Microsoft.Common.CheckBox",
+            "label": "Add a public IP address to this VM",
+            "defaultValue": false,
+            "toolTip": "Assign a public IP address. Only needed for direct RDP access from outside the VNet."
           }
         ]
       },
@@ -204,6 +211,7 @@
       "adminUsername": "[basics('adminCredentials').userName]",
       "adminPassword": "[basics('adminCredentials').password]",
       "adminPasswordConfirm": "[basics('adminCredentials').password]",
+      "addPublicIP": "[steps('networkSettings').addPublicIP]",
       "vnetName": "[steps('networkSettings').vnetCombo.name]",
       "vnetResourceGroup": "[steps('networkSettings').vnetCombo.resourceGroup]",
       "subnetName": "[steps('networkSettings').vnetCombo.subnets.subnet1.name]",

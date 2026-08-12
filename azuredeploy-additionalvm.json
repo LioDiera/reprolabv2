@@ -128,6 +128,13 @@
       "metadata": {
         "description": "Disk storage type: Standard_LRS (Standard HDD) for best cost or StandardSSD_LRS (Standard SSD) for better performance."
       }
+    },
+    "addPublicIP": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Assign a public IP address to this VM. Only needed if you require direct internet access or RDP from outside the VNet."
+      }
     }
   },
 
@@ -140,29 +147,87 @@
     "passwordsMatch": "[equals(parameters('adminPassword'), parameters('adminPasswordConfirm'))]",
     "passwordValidation": "[if(variables('passwordsMatch'), parameters('adminPassword'), div(1, 0))]",
     "templateLocationURI": "[concat(parameters('assetLocationURI'), 'Templates/')]",
-    "VM-DeploymentName": "[concat(deployment().Name, '-AdditionalVM')]",
     "DomainJoin-DeploymentName": "[concat(deployment().Name, '-AdditionalVM-DomainJoin')]"
   },
 
   "resources": [
     {
-      "name": "[variables('VM-DeploymentName')]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2016-02-01",
+      "condition": "[parameters('addPublicIP')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[concat(variables('computedVmName'), '-pip')]",
+      "apiVersion": "2021-02-01",
+      "location": "[resourceGroup().location]",
+      "sku": { "name": "Basic" },
       "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(variables('templateLocationURI'), 'VM.json')]",
-          "contentVersion": "1.0.0.0"
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(variables('computedVmName'), '-NIC')]",
+      "apiVersion": "2021-02-01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('computedVmName'), '-pip'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('subnetId')]"
+              },
+              "publicIPAddress": "[if(parameters('addPublicIP'), createObject('id', resourceId('Microsoft.Network/publicIPAddresses', concat(variables('computedVmName'), '-pip'))), null())]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[variables('computedVmName')]",
+      "apiVersion": "2019-07-01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('computedVmName'), '-NIC'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
         },
-        "parameters": {
-          "vmName": { "value": "[variables('computedVmName')]" },
-          "vmSize": { "value": "[parameters('vmSize')]" },
-          "adminUsername": { "value": "[parameters('adminUsername')]" },
-          "adminPassword": { "value": "[variables('passwordValidation')]" },
-          "vmNIcSubnetId": { "value": "[variables('subnetId')]" },
-          "OSImage": { "value": "[parameters('OSImage')]" },
-          "osDiskType": { "value": "[parameters('diskStorageType')]" }
+        "osProfile": {
+          "computerName": "[variables('computedVmName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[variables('passwordValidation')]",
+          "windowsConfiguration": {
+            "provisionVMAgent": true,
+            "enableAutomaticUpdates": true
+          }
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "[parameters('OSImage')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('computedVmName'), '-osdisk')]",
+            "createOption": "FromImage",
+            "managedDisk": {
+              "storageAccountType": "[parameters('diskStorageType')]"
+            },
+            "caching": "ReadWrite"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('computedVmName'), '-NIC'))]"
+            }
+          ]
         }
       }
     },
@@ -172,7 +237,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2016-02-01",
       "dependsOn": [
-        "[variables('VM-DeploymentName')]"
+        "[resourceId('Microsoft.Compute/virtualMachines', variables('computedVmName'))]"
       ],
       "properties": {
         "mode": "Incremental",
