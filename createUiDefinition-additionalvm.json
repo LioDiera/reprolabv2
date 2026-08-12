@@ -65,15 +65,21 @@
             }
           },
           {
+            "name": "subnetsApi",
+            "type": "Microsoft.Solutions.ArmApiControl",
+            "request": {
+              "method": "GET",
+              "path": "[concat(steps('networkSettings').existingVnet.id, '/subnets?api-version=2021-02-01')]"
+            }
+          },
+          {
             "name": "subnetName",
-            "type": "Microsoft.Common.TextBox",
+            "type": "Microsoft.Common.DropDown",
             "label": "Subnet Name",
-            "defaultValue": "",
-            "toolTip": "Name of the subnet within the selected VNet to attach this VM to (e.g. CorpNetliod1 for the internal subnet).",
+            "toolTip": "Select the subnet to attach this VM to.",
             "constraints": {
               "required": true,
-              "regex": "^[a-zA-Z0-9._-]{1,80}$",
-              "validationMessage": "Enter a valid subnet name."
+              "allowedValues": "[map(steps('networkSettings').subnetsApi.value, (item) => createObject('label', item.name, 'value', item.name))]"
             }
           },
           {
