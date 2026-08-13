@@ -77,7 +77,7 @@
               "subnet1": {
                 "label": "Subnet",
                 "defaultValue": {
-                  "name": "CorpNet",
+                  "name": "",
                   "addressPrefixSize": "/24"
                 },
                 "constraints": {
