@@ -63,8 +63,9 @@
               "subnets": "Select the subnet for the new VM."
             },
             "defaultValue": {
-              "name": "",
-              "addressPrefixSize": "/23"
+              "name": "syncnet",
+              "addressPrefixSize": "/23",
+              "newOrExisting": "existing"
             },
             "constraints": {
               "minAddressPrefixSize": "/29"
@@ -76,7 +77,7 @@
               "subnet1": {
                 "label": "Subnet",
                 "defaultValue": {
-                  "name": "",
+                  "name": "CorpNet",
                   "addressPrefixSize": "/24"
                 },
                 "constraints": {
