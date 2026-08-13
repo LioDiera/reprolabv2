@@ -69,7 +69,7 @@
             "type": "Microsoft.Solutions.ArmApiControl",
             "request": {
               "method": "GET",
-              "path": "[if(empty(steps('networkSettings').existingVnet.id), concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '?api-version=2021-04-01'), concat(steps('networkSettings').existingVnet.id, '?api-version=2021-02-01'))]"
+              "path": "[if(empty(steps('networkSettings').existingVnet.name), concat('subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '?api-version=2021-04-01'), concat('subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', steps('networkSettings').existingVnet.name, '?api-version=2021-02-01'))]"
             }
           },
           {
